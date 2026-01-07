@@ -1,0 +1,67 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Receive Service
+    description: ReceiveService provides file consistency verification reporting.
+    contact:
+        name: omalloc
+        url: https://github.com/omalloc/trust-receive
+    license:
+        name: MIT
+        url: https://github.com/omalloc/trust-receive/blob/main/LICENSE
+    version: 1.0.0
+paths:
+    /receive:
+        post:
+            tags:
+                - ReceiveService
+            summary: Receive reported file information
+            description: Validates reported file information against authoritative records.
+            operationId: ReceiveService_Receive
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/receive.v1.ReceiveRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/receive.v1.ReceiveReply'
+components:
+    schemas:
+        receive.v1.ReceiveReply:
+            type: object
+            properties:
+                message:
+                    example: "ok"
+                    type: string
+                    description: Confirmation message.
+            description: ReceiveReply represents the response of file information reporting.
+        receive.v1.ReceiveRequest:
+            type: object
+            properties:
+                url:
+                    example: "https://example.com/static/js/main.js"
+                    type: string
+                    description: The full URL of the file resource.
+                hash:
+                    example: "d41d8cd98f00b204e9800998ecf8427e"
+                    type: string
+                    description: The HASH value of the file (e.g., MD5 or SHA256).
+                lm:
+                    example: "Wed, 21 Oct 2015 07:28:00 GMT"
+                    type: string
+                    description: The Last-Modified header value from the origin server.
+                cl:
+                    example: 1024
+                    type: string
+                    description: The Content-Length of the file in bytes.
+            description: ReceiveRequest represents the request to report file information.
+tags:
+    - name: ReceiveService

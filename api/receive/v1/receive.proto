@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package receive.v1;
+
+import "google/api/annotations.proto";
+import "openapi/v3/annotations.proto";
+
+option go_package = "github.com/omalloc/trust-receive/api/receive/v1;v1";
+option java_multiple_files = true;
+option java_package = "com.omalloc.trust-receive.api.receive.v1";
+option java_outer_classname = "ReceiveProtoV1";
+
+option (openapi.v3.document) = {
+  info: {
+    title: "Receive Service";
+    version: "1.0.0";
+    description: "ReceiveService provides file consistency verification reporting.";
+    contact: {
+      name: "omalloc";
+      url: "https://github.com/omalloc/trust-receive";
+    };
+    license: {
+      name: "MIT";
+      url: "https://github.com/omalloc/trust-receive/blob/main/LICENSE";
+    };
+  };
+};
+
+// ReceiveService provides file consistency verification reporting.
+service ReceiveService {
+  // Receive validates reported file information.
+  rpc Receive (ReceiveRequest) returns (ReceiveReply) {
+    option (google.api.http) = {
+      post: "/receive"
+      body: "*"
+    };
+    option (openapi.v3.operation) = {
+      summary: "Receive reported file information";
+      description: "Validates reported file information against authoritative records.";
+    };
+  }
+}
+
+// ReceiveRequest represents the request to report file information.
+message ReceiveRequest {
+  option (openapi.v3.schema) = {
+    description: "ReceiveRequest represents the request to report file information.";
+  };
+  // StoreUrl
+  string url = 1 [
+    (openapi.v3.property) = {
+      description: "The full URL of the file resource.";
+      example: {
+        yaml: "\"https://example.com/static/js/main.js\""
+      }
+    }
+  ];
+  // File hash (Hash)
+  string hash = 2 [
+    (openapi.v3.property) = {
+      description: "The HASH value of the file (e.g., MD5 or SHA256).";
+      example: {
+        yaml: "\"d41d8cd98f00b204e9800998ecf8427e\""
+      }
+    }
+  ];
+  // Last Modified time
+  string lm = 3 [
+    (openapi.v3.property) = {
+      description: "The Last-Modified header value from the origin server.";
+      example: {
+        yaml: "\"Wed, 21 Oct 2015 07:28:00 GMT\""
+      }
+    }
+  ];
+  // Content Length
+  uint64 cl = 4 [
+    (openapi.v3.property) = {
+      description: "The Content-Length of the file in bytes.";
+      example: {
+        yaml: "1024"
+      }
+    }
+  ];
+}
+
+// ReceiveReply represents the response of file information reporting.
+message ReceiveReply {
+  option (openapi.v3.schema) = {
+    description: "ReceiveReply represents the response of file information reporting.";
+  };
+  // Result message
+  string message = 1 [
+    (openapi.v3.property) = {
+      description: "Confirmation message.";
+      example: {
+        yaml: "\"ok\""
+      }
+    }
+  ];
+}

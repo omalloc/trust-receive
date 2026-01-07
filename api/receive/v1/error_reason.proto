@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package receive.v1;
+
+option go_package = "github.com/omalloc/trust-receive/api/receive/v1;v1";
+option java_multiple_files = true;
+option java_package = "com.omalloc.trust-receive.api.receive.v1";
+option objc_class_prefix = "APIReceiveV1";
+
+// ErrorReason defines the potential error reasons.
+enum ErrorReason {
+  // Unspecified error
+  RECEIVE_UNSPECIFIED = 0;
+}
