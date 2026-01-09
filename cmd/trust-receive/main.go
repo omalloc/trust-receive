@@ -6,6 +6,8 @@ import (
 
 	"github.com/go-kratos/kratos/v2/encoding/json"
 	"github.com/omalloc/trust-receive/internal/conf"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -34,6 +36,13 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 
 	json.MarshalOptions.UseProtoNames = true
+
+	prometheus.Unregister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	prometheus.Unregister(collectors.NewGoCollector())
+
+	registerer := prometheus.WrapRegistererWithPrefix("tr_trust_receive_", prometheus.DefaultRegisterer)
+	registerer.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	registerer.MustRegister(collectors.NewGoCollector())
 }
 
 func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {

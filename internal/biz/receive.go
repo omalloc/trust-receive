@@ -10,6 +10,16 @@ import (
 
 	"github.com/bits-and-blooms/bloom/v3"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	_metricVerifiedConflictTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "tr_",
+		Subsystem: "trust_receive",
+		Name:      "verified_conflict_total",
+		Help:      "Total number of file verification conflicts detected",
+	}, []string{"url", "hash", "conflict_hash", "last_modified", "file_size"})
 )
 
 // FileInfo stores file verification information
@@ -33,6 +43,10 @@ type ReceiveRepo interface {
 // Alerter defines the alert handling interface
 type Alerter interface {
 	Alert(ctx context.Context, msg string) error
+}
+
+func init() {
+	prometheus.MustRegister(_metricVerifiedConflictTotal)
 }
 
 // ReceiveUsecase is the business usecase for handling reception logic
@@ -84,6 +98,8 @@ func (uc *ReceiveUsecase) Verify(ctx context.Context, info *FileInfo) error {
 	if storedHash != hash {
 		msg := fmt.Sprintf("CRITICAL: File inconsistency detected for URL: %s (LM: %s) Stored: [Hash: %s] Reported: [Hash: %s]",
 			info.URL, info.LastModified, storedHash, hash)
+
+		_metricVerifiedConflictTotal.WithLabelValues(info.URL, storedHash, hash, info.LastModified, fmt.Sprintf("%d", info.FileSize)).Inc()
 
 		// Trigger alert or execute command
 		if uc.alerter != nil {

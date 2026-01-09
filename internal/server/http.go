@@ -4,6 +4,7 @@ import (
 	v1 "github.com/omalloc/trust-receive/api/receive/v1"
 	"github.com/omalloc/trust-receive/internal/conf"
 	"github.com/omalloc/trust-receive/internal/service"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -28,6 +29,9 @@ func NewHTTPServer(c *conf.Server, greeter *service.ReceiveServiceService, logge
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
+	srv.Handle("/metrics", promhttp.Handler())
+
 	v1.RegisterReceiveServiceHTTPServer(srv, greeter)
+
 	return srv
 }
